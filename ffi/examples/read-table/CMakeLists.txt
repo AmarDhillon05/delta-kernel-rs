@@ -39,35 +39,35 @@ target_include_directories(commit_range_commit_files PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/../common")
 target_link_directories(commit_range_commit_files PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../../target/debug")
 target_link_libraries(commit_range_commit_files PUBLIC delta_kernel_ffi)
-set(TestRunner "../../../tests/read-table-testing/run_test.sh")
+set(TestRunner "../../../tests/run_and_diff.sh")
 set(DatPath "../../../../acceptance/tests/dat/out/reader_tests/generated")
 set(ExpectedPath "../../../tests/read-table-testing/expected-data")
 set(KernelTestPath "../../../../kernel/tests/data")
-add_test(NAME read_and_print_all_prim COMMAND ${TestRunner} ${DatPath}/all_primitive_types/delta/ ${ExpectedPath}/all-prim-types.expected)
-add_test(NAME read_and_print_all_prim_cols COMMAND ${TestRunner} ${DatPath}/all_primitive_types/delta/ ${ExpectedPath}/all-prim-types-cols.expected -cdecimal,float64)
-add_test(NAME read_and_print_nested COMMAND ${TestRunner} ${DatPath}/nested_types/delta/ ${ExpectedPath}/nested-types.expected)
-add_test(NAME read_and_print_nested_cols COMMAND ${TestRunner} ${DatPath}/nested_types/delta/ ${ExpectedPath}/nested-types-cols.expected -cmap,struct,array)
-add_test(NAME read_and_print_basic_partitioned COMMAND ${TestRunner} ${DatPath}/basic_partitioned/delta/ ${ExpectedPath}/basic-partitioned.expected)
-add_test(NAME read_and_print_with_dv_small COMMAND ${TestRunner} ${KernelTestPath}/table-with-dv-small/ ${ExpectedPath}/table-with-dv-small.expected)
-add_test(NAME read_and_print_void_col COMMAND ${TestRunner} ${KernelTestPath}/void-column/ ${ExpectedPath}/void-column.expected -cid,void_col)
-add_test(NAME read_and_print_with_short_dv COMMAND ${TestRunner} ${KernelTestPath}/with-short-dv/ ${ExpectedPath}/with-short-dv.expected)
+add_test(NAME read_and_print_all_prim COMMAND ${TestRunner} ${ExpectedPath}/all-prim-types.expected ./read_table ${DatPath}/all_primitive_types/delta/)
+add_test(NAME read_and_print_all_prim_cols COMMAND ${TestRunner} ${ExpectedPath}/all-prim-types-cols.expected ./read_table -cdecimal,float64 ${DatPath}/all_primitive_types/delta/)
+add_test(NAME read_and_print_nested COMMAND ${TestRunner} ${ExpectedPath}/nested-types.expected ./read_table ${DatPath}/nested_types/delta/)
+add_test(NAME read_and_print_nested_cols COMMAND ${TestRunner} ${ExpectedPath}/nested-types-cols.expected ./read_table -cmap,struct,array ${DatPath}/nested_types/delta/)
+add_test(NAME read_and_print_basic_partitioned COMMAND ${TestRunner} ${ExpectedPath}/basic-partitioned.expected ./read_table ${DatPath}/basic_partitioned/delta/)
+add_test(NAME read_and_print_with_dv_small COMMAND ${TestRunner} ${ExpectedPath}/table-with-dv-small.expected ./read_table ${KernelTestPath}/table-with-dv-small/)
+add_test(NAME read_and_print_void_col COMMAND ${TestRunner} ${ExpectedPath}/void-column.expected ./read_table -cid,void_col ${KernelTestPath}/void-column/)
+add_test(NAME read_and_print_with_short_dv COMMAND ${TestRunner} ${ExpectedPath}/with-short-dv.expected ./read_table ${KernelTestPath}/with-short-dv/)
 # Exercises the Arrow batch-mode scan metadata path (scan_metadata_next_arrow). The arrow path
 # does not call read_parquet_file, so the data section is "[No data]"; this test still
 # requires PRINT_DATA=ON because iterate_scan_metadata_arrow is gated behind it.
-add_test(NAME read_arrow_metadata_basic COMMAND ${TestRunner} ${DatPath}/basic_partitioned/delta/ ${ExpectedPath}/basic-partitioned-arrow-metadata.expected -a)
+add_test(NAME read_arrow_metadata_basic COMMAND ${TestRunner} ${ExpectedPath}/basic-partitioned-arrow-metadata.expected ./read_table -a ${DatPath}/basic_partitioned/delta/)
 # Exercises typed field metadata across the FFI: the column_mapping table's fields carry
 # `delta.columnMapping.id`, which the schema visitor reads back via get_from_metadata_map and
 # prints per field.
-add_test(NAME read_column_mapping_metadata COMMAND ${TestRunner} ${DatPath}/column_mapping/delta/ ${ExpectedPath}/column-mapping-arrow-metadata.expected -a)
-add_test(NAME read_projected_column_mapping COMMAND ${TestRunner} ${DatPath}/column_mapping/delta/ ${ExpectedPath}/column-mapping-projected.expected -cletter,new_int)
+add_test(NAME read_column_mapping_metadata COMMAND ${TestRunner} ${ExpectedPath}/column-mapping-arrow-metadata.expected ./read_table -a ${DatPath}/column_mapping/delta/)
+add_test(NAME read_projected_column_mapping COMMAND ${TestRunner} ${ExpectedPath}/column-mapping-projected.expected ./read_table -cletter,new_int ${DatPath}/column_mapping/delta/)
 add_test(NAME commit_range_commit_files_basic_partitioned
   COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/../../tests/read-table-testing/run_commit_range_commit_files_test.sh"
   "${CMAKE_CURRENT_SOURCE_DIR}/../../../acceptance/tests/dat/out/reader_tests/generated/basic_partitioned/delta/"
   "${CMAKE_CURRENT_SOURCE_DIR}/../../tests/read-table-testing/expected-data/commit-range-commit-files-basic-partitioned.expected")
 if(GEO_TYPE_IN_DEV)
   target_compile_definitions(read_table PUBLIC DEFINE_GEO_TYPE_IN_DEV)
-  add_test(NAME read_and_print_geo COMMAND ${TestRunner} ${KernelTestPath}/table-with-geo/ ${ExpectedPath}/table-with-geo.expected)
-  add_test(NAME read_and_print_projected_geo COMMAND ${TestRunner} ${KernelTestPath}/table-with-geo/ ${ExpectedPath}/table-with-geo-cols.expected "-cgeom,geog -s")
+  add_test(NAME read_and_print_geo COMMAND ${TestRunner} ${ExpectedPath}/table-with-geo.expected ./read_table ${KernelTestPath}/table-with-geo/)
+  add_test(NAME read_and_print_projected_geo COMMAND ${TestRunner} ${ExpectedPath}/table-with-geo-cols.expected ./read_table -cgeom,geog -s ${KernelTestPath}/table-with-geo/)
 endif()
 
 if(WIN32)

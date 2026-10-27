@@ -171,11 +171,10 @@ make test
 
 ### Test Scripts
 
-The examples use test scripts located in the `tests/` directory:
-- `tests/read-table-testing/run_test.sh` - Tests table reading functionality
-- `tests/test-expression-visitor/run_test.sh` - Tests expression visitor functionality
-
-These scripts validate the output against expected results and provide detailed diagnostics.
+The read-table and visit-expression tests use `tests/run_and_diff.sh <expected_file> <command>
+[args...]`, which runs the example binary and diffs its output against the expected file in
+`tests/read-table-testing/expected-data/` or `tests/test-expression-visitor/expected.txt`. The
+other examples have their own `run_test.sh` under `tests/`.
 
 ## C/C++ Extension (VSCode)
 

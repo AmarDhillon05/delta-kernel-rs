@@ -20,6 +20,6 @@ endif()
 
 # Add the kernel expresion -> engine expression test
 include(CTest)
-set(ExprTestRunner "../../../tests/test-expression-visitor/run_test.sh")
+set(ExprTestRunner "../../../tests/run_and_diff.sh")
 set(ExprExpectedPath "../../../tests/test-expression-visitor/expected.txt")
-add_test(NAME test_expression_visitor COMMAND ${ExprTestRunner} ${ExprExpectedPath})
+add_test(NAME test_expression_visitor COMMAND ${ExprTestRunner} ${ExprExpectedPath} ./visit_expression)
